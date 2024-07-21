@@ -1,0 +1,174 @@
+let id = null;
+let MASTER_MAPS = ['Siege', 'Flood'];
+let maps = [];
+function init()
+{
+	for(let m = 0; m < MASTER_MAPS.length; m++)
+	{
+	  maps.push(MASTER_MAPS[m]);
+	}
+//	sessionStorage.setItem("savedMaps", maps);
+	restart();
+	checkForMaps();
+/*
+	window.onload = function() {
+	   var reloading = sessionStorage.getItem("reloading");
+    	   if (reloading) {
+	       log("reloading ");
+    	      sessionStorage.removeItem("reloading");
+	      let tmpMaps = sessionStorage.get("savedMaps");
+	      if(tmpMaps !== null && tmpMaps !== undefined)
+	      {
+		MASTER_MAPS = [...tmpMaps];
+	      }
+    	      init();
+    	   }
+	};
+*/
+
+}
+
+/*
+function reloadPage()
+{
+	sessionStorage.setItem("reloading", "true");
+	document.location.reload();
+}
+
+*/
+function checkForMaps()
+{
+	log("Checking For Servers Running maps in our list..."); // used to print run time
+	if(maps.length === 0)
+	{
+	  log("Either a wait is in effect, or maps array is empty");
+	  return;
+	}
+	
+	document.getElementsByClassName("serverbrowser-refresh")[0].click();
+	setTimeout(()=> {	
+	let elements = document.getElementsByClassName("server-row");
+        let serversOfInterest = [];
+	let inGame = false;
+	for(let e = 0; e < elements.length; e++)
+        {
+	  let map = elements[e].getElementsByClassName("server")[0].getElementsByClassName("map")[0];
+
+	  for(let m = 0; m < maps.length; m++)
+	  {
+		if(map !== undefined && map.innerText !== undefined && map.innerText.includes(maps[m]))
+	  	{
+		   //alert("JOIN "+elements[e].getElementsByClassName("server-name").innerText);
+		   log("In Game? " + inGame);
+		   let occupied = new Number(elements[e].getElementsByClassName("players")[0].getElementsByClassName("occupied")[0].innerText);
+		   let max = new Number(elements[e].getElementsByClassName("players")[0].getElementsByClassName("max")[0].innerText);
+		   if( (occupied/max) >= (20/64))
+		   {
+		      if(!inGame && document.getElementsByClassName("ugm-playing-misc").length > 0 && document.getElementsByClassName("ugm-playing-misc")[0].innerText.trim() === elements[e].getElementsByClassName("server")[0].getElementsByClassName("server-name")[0].innerText.trim())
+		      {
+			log("Marking as in game");
+			inGame = true;
+		      }
+		      if(!inGame)
+		      {
+			 log("New server of interest: " + elements[e].getElementsByClassName("server")[0].getElementsByClassName("server-name")[0].innerText + " - " + map.innerText);
+			 serversOfInterest.push(elements[e].getElementsByClassName("server")[0].getElementsByClassName("server-name")[0].innerText + " - " + map.innerText);
+                      }
+		      else
+                      {
+			reloadPage();
+                      }
+		   }
+	        }
+	  }
+	   
+        }
+        if(serversOfInterest.length > 0)
+	{
+           let result = new Date() + "\n";
+	   for(let so = 0; so < serversOfInterest.length; so++)
+	   {
+	      result += serversOfInterest[so] +"\n";
+	   }
+	   alert(result);
+           log("JOIN "+result);
+	}
+	//id = setInterval(checkForMaps, 1000*60);
+     }, 2000);
+}
+
+function stop()
+{
+	log("Clearing " + id);
+	clearInterval(id);
+}
+
+function restart()
+{
+	if(id !== null)
+	{
+	  stop();
+	  log("Restarting...");
+	}
+	log("Starting... ");
+	id = setInterval(checkForMaps, 1000*60);
+	log("New ID is " + id);
+}
+
+function pause(minutes)
+{
+	log("Erasing maps for " + minutes + " minutes");
+	maps = [];
+	setTimeout(repopulateMaps, (minutes*(60000)));
+}
+
+function repopulateMaps()
+{
+	log("Repopulating map array");
+	maps = [];
+	sessionStorage.setItem("savedMaps", maps);
+	init();
+}
+
+function addMap(map)
+{
+	log("Added Map " + map);
+	maps.push(map);
+	MASTER_MAPS.push(map);
+//	sessionStorage.setItem("savedMaps", maps);
+}
+
+function addTestMaps()
+{
+	addMap("Golmud");
+	addMap("Zavod");
+}
+
+function removeMap(map)
+{
+	log("Removing map " + map);
+	MASTER_MAPS.pop(map);
+	maps.pop(map);
+	printActiveMaps();
+}
+function log(toLog)
+{
+    console.log(new Date() + ((toLog === null || toLog === undefined || toLog === "") ? "" : (" - " + toLog)));
+}
+
+function help()
+{
+	console.log("Before copying and pasting in the Console in Dev Tools on the battlelog Multiplayer page, add part of the map name to MASTER_MAPS on line 2 (Caps are important).");
+	console.log("Use pause(**Minutes to pause**); to pause the script");
+	console.log("stop() completely stops the script (Refreshing or closing the multiplayer tab will do the same thing)");
+	console.log("addMap(**part of map Name in quotes**) will add a map to your list when the script is already running (Caps are important)");
+	console.log("removeMap(**part of map Name in quotes**) will remove a map to your list when the script is already running (Caps are important)");
+	console.log("repopulateMaps() will un-pause manually");
+	console.log("restart() will (re)start the script");
+}
+
+function printActiveMaps()
+{
+	log("Active Maps: " + JSON.stringify(maps));
+}
+init();
