@@ -1,6 +1,6 @@
 let id = null;
-let MASTER_MAPS = ['Siege', 'Flood'];
-let SERVER_BLOCK_LIST = [""]; // Servers youre banned from, or who have ping restrictions
+let MASTER_MAPS = ['Siege', 'Flood', 'Whiteout', 'Rogue', 'Sunken', 'Altai', 'Hainan'];
+let SERVER_BLOCK_LIST = ["!#1 SERVER BIG BOOBS ( . )( . ) ALL NOOBS NO RULES ALL OUT WAR!"];
 let maps = [];
 let MAX_QUEUE = 6;
 let pauseIfInGame = false;
@@ -17,6 +17,7 @@ function init()
 
 function checkForMaps()
 {
+	removeServerFinderUI();
 	log("Checking For Servers Running maps in our list..."); // used to print run time
 	if(maps.length === 0)
 	{
@@ -26,7 +27,7 @@ function checkForMaps()
 	
 	document.getElementsByClassName("serverbrowser-refresh")[0].click();
 	setTimeout(()=> {	
-		removeServerFinderUI();
+		
 
 		let elements = document.getElementsByClassName("server-row");
 		let serversOfInterest = [];
@@ -39,26 +40,26 @@ function checkForMaps()
 		{
 			if(map !== undefined && map.innerText !== undefined && map.innerText.includes(maps[m]))
 			{
-			log("In Game? " + inGame);
-			let occupied = new Number(elements[e].getElementsByClassName("players")[0].getElementsByClassName("occupied")[0].innerText);
-			let max = new Number(elements[e].getElementsByClassName("players")[0].getElementsByClassName("max")[0].innerText);
-			let queueElements = elements[e].getElementsByClassName("players")[0].getElementsByClassName("queue");
-			let hasQueue = queueElements.length > 0;
-			let queue = hasQueue ? new Number(queueElements[0].innerText) : 0;
-			if( (occupied/max) >= (20/64) && queue <= MAX_QUEUE)
-			{
-				if(pauseIfInGame && !inGame && document.getElementsByClassName("ugm-playing-misc").length > 0 && document.getElementsByClassName("ugm-playing-misc")[0].innerText.trim() === elements[e].getElementsByClassName("server")[0].getElementsByClassName("server-name")[0].innerText.trim())
+				log("In Game? " + inGame);
+				let occupied = new Number(elements[e].getElementsByClassName("players")[0].getElementsByClassName("occupied")[0].innerText);
+				let max = new Number(elements[e].getElementsByClassName("players")[0].getElementsByClassName("max")[0].innerText);
+				let queueElements = elements[e].getElementsByClassName("players")[0].getElementsByClassName("queue");
+				let hasQueue = queueElements.length > 0;
+				let queue = hasQueue ? new Number(queueElements[0].innerText) : 0;
+				if( (occupied/max) >= (20/64) && queue <= MAX_QUEUE)
 				{
-					log("Marking as in game");
-					inGame = true;
-				}
-				if(!inGame && !SERVER_BLOCK_LIST.includes(elements[e].getElementsByClassName("server")[0].getElementsByClassName("server-name")[0].innerText))
-				{
-					log("New server of interest: " + elements[e].getElementsByClassName("server")[0].getElementsByClassName("server-name")[0].innerText + " - " + map.innerText);
-					serversOfInterest.push(elements[e].getElementsByClassName("server")[0].getElementsByClassName("server-name")[0].innerText + " - " + map.innerText);
+					if(pauseIfInGame && !inGame && document.getElementsByClassName("ugm-playing-misc").length > 0 && document.getElementsByClassName("ugm-playing-misc")[0].innerText.trim() === elements[e].getElementsByClassName("server")[0].getElementsByClassName("server-name")[0].innerText.trim())
+					{
+						log("Marking as in game");
+						inGame = true;
+					}
+					if(!inGame && !SERVER_BLOCK_LIST.includes(elements[e].getElementsByClassName("server")[0].getElementsByClassName("server-name")[0].innerText))
+					{
+						log("New server of interest: " + elements[e].getElementsByClassName("server")[0].getElementsByClassName("server-name")[0].innerText + " - " + map.innerText);
+						serversOfInterest.push(elements[e].getElementsByClassName("server")[0].getElementsByClassName("server-name")[0].innerText + " - " + map.innerText);
+					}
 				}
 			}
-				}
 		}
 		
 		}
@@ -84,8 +85,12 @@ function removeServerFinderUI()
 
 function reportFindings(findings)
 {
+
+
 	const parent = document.getElementById("base-page");
 	const contentDiv = document.createElement("div");
+	// const p = document.createElement("p");
+	// p.textContent = "TEST!!!";
 	contentDiv.id = "server-finder";
 	contentDiv.style.backgroundColor = "red";
 	contentDiv.style.width = "30%";
@@ -95,6 +100,8 @@ function reportFindings(findings)
 	//contentDiv.style.left = 0;
 	contentDiv.style.right= "0px";
 	contentDiv.style.zIndex = 99999;
+	// contentDiv.appendChild(p);
+	// parent.appendChild(contentDiv);
 	if(findings.length > 0)
 	{
 		let p1 = document.createElement("p");
@@ -116,7 +123,6 @@ function reportFindings(findings)
 		}
 		parent.appendChild(contentDiv);
 	}
-// uncomment the lines below, and comment the lines above to get the new window with the results instead.
 /*
 	if(findings.length > 0)
 	{
@@ -131,7 +137,7 @@ function reportFindings(findings)
 		setTimeout(function() {w.close();}, 15000)
 		log("JOIN "+result);
 	}
-*/
+	*/
 }
 
 function restart()
